@@ -1,0 +1,38 @@
+public class ArrayMultiplication {
+    public static void main(String[] args) {
+        int n = 5;
+
+        int[] a = new int[n];
+        int[] b = new int[n];
+        int[] c = new int[n];
+        // importing random number generator
+        java.util.Random rand = new java.util.Random();
+
+        for (int i = 0; i < n; i++) {
+            a[i] = rand.nextInt(10) + 1;
+            b[i] = rand.nextInt(10) + 1;
+            c[i] = a[i] * b[i];
+        }
+
+        // Print arrays
+        System.out.print("Array a: ");
+        for (int i = 0; i < n; i++) {
+            System.out.print(a[i] + " ");
+        }
+        System.out.println();
+
+        System.out.print("Array b: ");
+        for (int i = 0; i < n; i++) {
+            System.out.print(b[i] + " ");
+        }
+        System.out.println();
+        //multiplication of Array a and b = c
+        System.out.print("Array c (a[i] * b[i]): ");
+        for (int i = 0; i < n; i++) {
+            System.out.print(c[i] + " ");
+        }
+        System.out.println();
+    }
+}
+
+
