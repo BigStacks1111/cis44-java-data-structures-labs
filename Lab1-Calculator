@@ -1,0 +1,86 @@
+import java.util.Scanner;
+
+public class Calculator {
+
+    private double currentValue = 0;
+    private String lastOperator = "+";
+    private boolean firstInput = true;
+
+    public void run() {
+        var scanner = new Scanner(System.in);
+        System.out.println("Basic Calculator");
+        System.out.println("Enter numbers and operators (+, -, *, /, =) one per line.");
+        System.out.println("Type 'exit' to quit.\n");
+
+        while (true) {
+            System.out.print("> ");
+            var input = scanner.nextLine().trim();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("Calculator terminated.");
+                break;
+            }
+
+            if (isNumber(input)) {
+                var number = Double.parseDouble(input);
+                processNumber(number);
+            } else if (isOperator(input)) {
+                processOperator(input);
+            } else {
+                System.out.println("Invalid input. Please enter a number, an operator (+, -, *, /, =), or 'exit'.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    private boolean isNumber(String input) {
+        try {
+            Double.parseDouble(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isOperator(String input) {
+        return input.equals("+") || input.equals("-") ||
+                input.equals("*") || input.equals("/") || input.equals("=");
+    }
+
+    private void processNumber(double number) {
+        if (firstInput) {
+            currentValue = number;
+            firstInput = false;
+        } else {
+            switch (lastOperator) {
+                case "+" -> currentValue += number;
+                case "-" -> currentValue -= number;
+                case "*" -> currentValue *= number;
+                case "/" -> {
+                    if (number != 0) {
+                        currentValue /= number;
+                    } else {
+                        System.out.println("Error: Division by zero.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        System.out.println("= " + currentValue);
+    }
+
+    private void processOperator(String operator) {
+        if (operator.equals("=")) {
+            System.out.println("= " + currentValue);
+        } else {
+            lastOperator = operator;
+        }
+    }
+
+    public static void main(String[] args) {
+        var calculator = new Calculator();
+        calculator.run();
+    }
+}
