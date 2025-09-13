@@ -1,0 +1,154 @@
+// abstract parent class
+import java.util.Random;
+
+public abstract class Animal {
+    protected static Random rand = new Random();
+
+    // Each animal moves left (-1), right (+1), or stays (0)
+    public int moveDirection() {
+        return rand.nextInt(3) - 1;  // -1, 0, +1
+    }
+
+    public abstract char getSymbol(); // For visualization
+}
+
+// define concrete animal classes
+
+public class Bear extends Animal {
+    @Override
+    public char getSymbol() {
+        return 'B';
+    }
+}
+
+public class Fish extends Animal {
+    @Override
+    public char getSymbol() {
+        return 'F';
+    }
+}
+
+// loops and conditional statements for ecosytem
+
+
+import java.util.Random;
+
+public class River {
+    private Animal[] cells;
+    private Random rand = new Random();
+
+    public River(int size, int numBears, int numFish) {
+        cells = new Animal[size];
+        populate(numBears, numFish);
+    }
+
+    private void populate(int numBears, int numFish) {
+        int placed = 0;
+
+        // Place bears
+        while (placed < numBears) {
+            int idx = rand.nextInt(cells.length);
+            if (cells[idx] == null) {
+                cells[idx] = new Bear();
+                placed++;
+            }
+        }
+
+        placed = 0;
+        // Place fish
+        while (placed < numFish) {
+            int idx = rand.nextInt(cells.length);
+            if (cells[idx] == null) {
+                cells[idx] = new Fish();
+                placed++;
+            }
+        }
+    }
+
+    public void step() {
+        for (int i = 0; i < cells.length; i++) {
+            Animal a = cells[i];
+            if (a == null) continue;
+
+            int dir = a.moveDirection();
+            int newPos = i + dir;
+
+            if (dir == 0 || newPos < 0 || newPos >= cells.length) {
+                continue; // stays put
+            }
+
+            if (cells[newPos] == null) {
+                // Move to empty cell
+                cells[newPos] = a;
+                cells[i] = null;
+            } else {
+                // Interaction
+                interact(i, newPos);
+            }
+        }
+    }
+
+    private void interact(int oldPos, int newPos) {
+        Animal a1 = cells[oldPos];
+        Animal a2 = cells[newPos];
+
+        if (a1.getClass() == a2.getClass()) {
+            // Same species → reproduce
+            int emptyIdx = findEmptyCell();
+            if (emptyIdx != -1) {
+                if (a1 instanceof Bear) {
+                    cells[emptyIdx] = new Bear();
+                } else {
+                    cells[emptyIdx] = new Fish();
+                }
+            }
+            // Animals stay put
+        } else {
+            // Bear eats Fish
+            if (a1 instanceof Bear && a2 instanceof Fish) {
+                cells[newPos] = a1;
+                cells[oldPos] = null;
+            } else if (a1 instanceof Fish && a2 instanceof Bear) {
+                cells[oldPos] = null;
+            }
+        }
+    }
+
+    private int findEmptyCell() {
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] == null) return i;
+        }
+        return -1;
+    }
+
+    public void display() {
+        for (Animal a : cells) {
+            if (a == null) {
+                System.out.print("-");
+            } else {
+                System.out.print(a.getSymbol());
+            }
+        }
+        System.out.println();
+    }
+}
+
+// main - simulator
+
+
+public class Simulation {
+    public static void main(String[] args) throws InterruptedException {
+        River river = new River(20, 3, 5); // River of size 20, with 3 bears and 5 fish
+
+        for (int t = 0; t < 15; t++) {
+            System.out.print("Step " + t + ": ");
+            river.display();
+            river.step();
+            Thread.sleep(500); // delay for readability
+        }
+
+        System.out.print("Final: ");
+        river.display();
+    }
+}
+
