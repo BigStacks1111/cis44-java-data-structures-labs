@@ -1,0 +1,74 @@
+public class DynamicArray<T> {
+    private T[] data;
+    private int size;
+    private static final int INITIAL_CAPACITY = 100;
+
+    @SuppressWarnings("unchecked")
+    public DynamicArray() {
+        //  cast
+        data = (T[]) new Object[INITIAL_CAPACITY];
+        size = 0;
+    }
+
+    public void add(T element) {
+        if (size == data.length) {
+            resize();
+        }
+        data[size++] = element;
+    }
+
+    public T get(int index) {
+        checkIndex(index);
+        return data[index];
+    }
+
+    public T remove(int index) {
+        checkIndex(index);
+        T removed = data[index];
+        // Shift elements left
+        for (int i = index; i < size - 1; i++) {
+            data[i] = data[i + 1];
+        }
+        data[size - 1] = null; // clear reference
+        size--;
+        return removed;
+    }
+
+    public int size() {
+        return size;
+    }
+
+// Main file
+
+public class DynamicArrayTest {
+    public static void main(String[] args) {
+        DynamicArray<String> arr = new DynamicArray<>();
+
+        // Adding elements
+        arr.add("Apple");
+        arr.add("Banana");
+        arr.add("Cherry");
+        arr.add("Date");
+
+        System.out.println("Size after adding 4 elements: " + arr.size());
+
+        // Retrieving elements
+        System.out.println("Element at index 1: " + arr.get(1));  // Banana
+
+        // Removing an element
+        String removed = arr.remove(2); // removes "Cherry"
+        System.out.println("Removed element: " + removed);
+
+        // Printing remaining elements
+        System.out.println("Elements after removal:");
+        for (int i = 0; i < arr.size(); i++) {
+            System.out.println("Index " + i + ": " + arr.get(i));
+        }
+
+        // Trigger resize by adding more elements
+        for (int i = 0; i < 20; i++) {
+            arr.add("Fruit" + i);
+        }
+        System.out.println("Size after adding more elements: " + arr.size());
+    }
+}
