@@ -1,0 +1,137 @@
+import java.util.Random;
+
+public class Matrix {
+    private int[][] data;
+
+    // Constructor for empty matrix with given dimensions
+    public Matrix(int rows, int cols) {
+        if (rows <= 0 || cols <= 0) {
+            throw new IllegalArgumentException("Rows and columns must be positive");
+        }
+        data = new int[rows][cols];
+    }
+
+    // Constructor utilizing 2D array
+    public Matrix(int[][] data) {
+        if (data == null || data.length == 0 || data[0].length == 0) {
+            throw new IllegalArgumentException("Data array must not be empty");
+        }
+        this.data = new int[data.length][data[0].length];
+        for (int i = 0; i < data.length; i++) {
+            if (data[i].length != data[0].length) {
+                throw new IllegalArgumentException("All rows must have the same length");
+            }
+            System.arraycopy(data[i], 0, this.data[i], 0, data[i].length);
+        }
+    }
+
+    // Populate with random integers 1–10
+    public void populateRandom() {
+        Random rand = new Random();
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                data[i][j] = rand.nextInt(10) + 1; // 1–10
+            }
+        }
+    }
+
+    // Matrix addition
+    public Matrix add(Matrix other) {
+        if (this.data.length != other.data.length || this.data[0].length != other.data[0].length) {
+            throw new IllegalArgumentException("Matrices must have the same dimensions for addition");
+        }
+
+        int rows = data.length;
+        int cols = data[0].length;
+        Matrix result = new Matrix(rows, cols);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result.data[i][j] = this.data[i][j] + other.data[i][j];
+            }
+        }
+        return result;
+    }
+
+    // Matrix multiplication
+    public Matrix multiply(Matrix other) {
+        if (this.data[0].length != other.data.length) {
+            throw new IllegalArgumentException("Matrix multiplication requires A.cols == B.rows");
+        }
+
+        int rows = this.data.length;
+        int cols = other.data[0].length;
+        int common = this.data[0].length;
+
+        Matrix result = new Matrix(rows, cols);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int sum = 0;
+                for (int k = 0; k < common; k++) {
+                    sum += this.data[i][k] * other.data[k][j];
+                }
+                result.data[i][j] = sum;
+            }
+        }
+        return result;
+    }
+
+    // String representation
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int[] row : data) {
+            for (int val : row) {
+                sb.append(String.format("%4d", val));
+            }
+
+// Main file
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            // Create and populate matrices
+            Matrix m1 = new Matrix(2, 3);
+            Matrix m2 = new Matrix(2, 3);
+            m1.populateRandom();
+            m2.populateRandom();
+
+            System.out.println("Matrix m1:");
+            System.out.println(m1);
+            System.out.println("Matrix m2:");
+            System.out.println(m2);
+
+            // Addition
+            System.out.println("m1 + m2:");
+            Matrix sum = m1.add(m2);
+            System.out.println(sum);
+
+            // Multiplication
+            Matrix m3 = new Matrix(3, 2);
+            m3.populateRandom();
+
+            System.out.println("Matrix m3:");
+            System.out.println(m3);
+
+            System.out.println("m1 * m3:");
+            Matrix product = m1.multiply(m3);
+            System.out.println(product);
+
+            // Exception demo (wrong dimensions for addition)
+            Matrix bad = new Matrix(3, 3);
+            bad.populateRandom();
+            System.out.println("Trying invalid addition...");
+            m1.add(bad); // should throw exception
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Exception caught: " + e.getMessage());
+        }
+    }
+}
+
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+}
