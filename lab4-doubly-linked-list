@@ -1,0 +1,106 @@
+public class TextEditor {
+
+    private static class Node {
+        String text;
+        Node prev, next;
+
+        Node(String text) {
+            this.text = text;
+        }
+    }
+
+    private Node current;  // current text
+
+    public TextEditor() {
+        // start of history
+        // initial empty document
+        current = new Node("");
+    }
+
+    // Add new text 
+    public void add(String newText) {
+        String combined = current.text + newText;
+        Node newNode = new Node(combined);
+
+        // Erase redo history
+        current.next = null;
+
+        // Link new node
+        newNode.prev = current;
+        current.next = newNode;
+        current = newNode;
+
+        System.out.println("Added text. Current state: \"" + current.text + "\"");
+    }
+
+    // Undo last change
+    public void undo() {
+        if (current.prev == null) {
+            System.out.println("No more undo available.");
+        } else {
+            current = current.prev;
+            System.out.println("Undo performed. Current state: \"" + current.text + "\"");
+        }
+    }
+
+    // Redo last undone change
+    public void redo() {
+        if (current.next == null) {
+            System.out.println("No more redo available.");
+        } else {
+            current = current.next;
+            System.out.println("Redo performed. Current state: \"" + current.text + "\"");
+        }
+    }
+
+    // Print current state
+    public void printCurrent() {
+        System.out.println("Current text: \"" + current.text + "\"");
+    }
+}
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- Simple Text Editor ---");
+            System.out.println("1. Add Text");
+            System.out.println("2. Undo");
+            System.out.println("3. Redo");
+            System.out.println("4. Print Current Text");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter text to add: ");
+                    String newText = scanner.nextLine();
+                    editor.add(newText);
+                    break;
+                case 2:
+                    editor.undo();
+                    break;
+                case 3:
+                    editor.redo();
+                    break;
+                case 4:
+                    editor.printCurrent();
+                    break;
+                case 5:
+                    System.out.println("Exiting editor...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
