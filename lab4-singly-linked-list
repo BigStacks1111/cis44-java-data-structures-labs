@@ -1,0 +1,175 @@
+public class Song {
+    private final String title;
+    private final String artist;
+
+    public Song(String title, String artist) {
+        this.title = title;
+        this.artist = artist;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    @Override
+    public String toString() {
+        return "\"" + title + "\" by " + artist;
+    }
+}
+
+public class Playlist {
+
+    private static class Node {
+        Song song;
+        Node next;
+
+        Node(Song song) {
+            this.song = song;
+            this.next = null;
+        }
+    }
+
+    private Node head;
+    private Node tail;
+    private Node current;  // keeps track of the current song while playing
+
+    public Playlist() {
+        head = null;
+        tail = null;
+        current = null;
+    }
+
+    // Add a song to the end of the playlist
+    public void addSong(Song song) {
+        Node newNode = new Node(song);
+        if (head == null) {
+            head = newNode;
+            tail = newNode;
+            tail.next = head; // make it circular
+        } else {
+            tail.next = newNode;
+            tail = newNode;
+            tail.next = head; // maintain circular link
+        }
+        if (current == null) {
+            current = head; // set the current to the first song if not set
+        }
+        System.out.println(song + " added to playlist.");
+    }
+
+    // Remove the first occurrence of a song with the given title
+    public void removeSong(String title) {
+        if (head == null) {
+            System.out.println("Playlist is empty.");
+            return;
+        }
+
+        Node temp = head;
+        Node prev = tail; // tail connects back to head
+
+        do {
+            if (temp.song.getTitle().equalsIgnoreCase(title)) {
+                if (temp == head && temp == tail) {
+                    head = null;
+                    tail = null;
+                    current = null;
+                } else {
+                    prev.next = temp.next;
+                    if (temp == head) head = temp.next;
+                    if (temp == tail) tail = prev;
+                    if (temp == current) current = temp.next;
+                }
+                System.out.println("Removed: " + temp.song);
+                return;
+            }
+            prev = temp;
+            temp = temp.next;
+        } while (temp != head);
+
+        System.out.println("Song with title \"" + title + "\" not found.");
+    }
+
+    // Play the current song and move to the next
+    public void playNext() {
+        if (current == null) {
+            System.out.println("Playlist is empty.");
+            return;
+        }
+        System.out.println("Now playing: " + current.song);
+        current = current.next; // advance to the next song (circular)
+    }
+
+    // Display the entire playlist
+    public void displayPlaylist() {
+        if (head == null) {
+            System.out.println("Playlist is empty.");
+            return;
+        }
+
+        Node temp = head;
+        System.out.println("Current Playlist:");
+        do {
+            System.out.println("- " + temp.song);
+            temp = temp.next;
+        } while (temp != head);
+    }
+}
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Playlist playlist = new Playlist();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- Music Playlist Menu ---");
+            System.out.println("1. Add Song");
+            System.out.println("2. Remove Song");
+            System.out.println("3. Play Next");
+            System.out.println("4. Display Playlist");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter song title: ");
+                    String title = scanner.nextLine();
+                    System.out.print("Enter artist: ");
+                    String artist = scanner.nextLine();
+                    playlist.addSong(new Song(title, artist));
+                    break;
+
+                case 2:
+                    System.out.print("Enter title of song to remove: ");
+                    String removeTitle = scanner.nextLine();
+                    playlist.removeSong(removeTitle);
+                    break;
+
+                case 3:
+                    playlist.playNext();
+                    break;
+
+                case 4:
+                    playlist.displayPlaylist();
+                    break;
+
+                case 5:
+                    System.out.println("Exiting playlist manager...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
