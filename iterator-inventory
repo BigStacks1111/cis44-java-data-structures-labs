@@ -1,0 +1,99 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+
+// Item class
+class Item {
+    private final String name;
+
+    public Item(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    // Useful for display
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+
+// Inventory class
+class Inventory {
+    private final ArrayList<Item> items;
+
+    public Inventory() {
+        items = new ArrayList<>();
+    }
+
+    // Add an item
+    public void addItem(Item item) {
+        items.add(item);
+    }
+
+    // Display all items
+    public void display() {
+        if (items.isEmpty()) {
+            System.out.println("Inventory is empty.");
+        } else {
+            System.out.println("Inventory items:");
+            for (Item item : items) {
+                System.out.println("- " + item);
+            }
+        }
+    }
+
+    // Combine two items into a new one
+    public void combineItems(String name1, String name2) {
+        Item first = null;
+        Item second = null;
+
+        // Use an iterator for safe removal
+        Iterator<Item> iterator = items.iterator();
+        while (iterator.hasNext()) {
+            Item current = iterator.next();
+            if (first == null && current.getName().equalsIgnoreCase(name1)) {
+                first = current;
+                iterator.remove(); // remove first match
+            } else if (second == null && current.getName().equalsIgnoreCase(name2)) {
+                second = current;
+                iterator.remove(); // remove second match
+            }
+        }
+
+        if (first != null && second != null) {
+            // Simple rule: combine into "Magic Staff" just for demo
+            Item newItem = new Item("Magic Staff");
+            items.add(newItem);
+            System.out.println("Combined " + first + " and " + second + " into " + newItem);
+        } else {
+            System.out.println("Could not find both items (" + name1 + ", " + name2 + ") to combine.");
+            // If one item was removed but second not found, we should put the removed one back
+            if (first != null) items.add(first);
+            if (second != null) items.add(second);
+        }
+    }
+}
+
+public class AdventureGame {
+    public static void main(String[] args) {
+        Inventory inventory = new Inventory();
+
+        // Add starting items
+        inventory.addItem(new Item("Stick"));
+        inventory.addItem(new Item("Crystal"));
+        inventory.addItem(new Item("Stone"));
+
+        // Show initial inventory
+        inventory.display();
+
+        System.out.println("\n--- Attempting to combine Stick and Crystal ---");
+        inventory.combineItems("Stick", "Crystal");
+
+        // Show updated inventory
+        System.out.println();
+        inventory.display();
+    }
+}
