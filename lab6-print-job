@@ -1,0 +1,80 @@
+public class PrintJob {
+    private final String documentName;
+    private final int numberOfPages;
+
+    // Constructor
+    public PrintJob(String documentName, int numberOfPages) {
+        this.documentName = documentName;
+        this.numberOfPages = numberOfPages;
+    }
+
+    // Getters
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public int getNumberOfPages() {
+        return numberOfPages;
+    }
+
+    @Override
+    public String toString() {
+        return documentName + " (" + numberOfPages + " pages)";
+    }
+}
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class Printer {
+    private final Queue<PrintJob> jobQueue;
+
+    // Constructor
+    public Printer() {
+        jobQueue = new LinkedList<>(); // Using LinkedList as a Queue
+    }
+
+    // Add a job to the queue
+    public void addJob(PrintJob job) {
+        jobQueue.offer(job); // Enqueue the job
+        System.out.println("Added job: " + job);
+    }
+
+    // Process the next job in the queue
+    public void processNextJob() {
+        if (jobQueue.isEmpty()) {
+            System.out.println("No jobs to process.");
+        } else {
+            PrintJob job = jobQueue.poll(); // Dequeue the job
+            System.out.println("Printing: " + job);
+        }
+    }
+
+    // check queue size
+    public int jobsRemaining() {
+        return jobQueue.size();
+    }
+
+    // process all jobs
+    public void processAllJobs() {
+        while (!jobQueue.isEmpty()) {
+            processNextJob();
+        }
+
+
+    }
+}
+
+    public static void main(String[] args) {
+        Printer printer = new Printer();
+
+        printer.addJob(new PrintJob("Report.pdf", 5));
+        printer.addJob(new PrintJob("Homework.docx", 3));
+        printer.addJob(new PrintJob("Presentation.pptx", 10));
+
+        printer.processNextJob();
+        printer.processNextJob();
+        printer.processNextJob();
+        printer.processNextJob(); // "No jobs to process."
+    }
+
