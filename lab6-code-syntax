@@ -1,0 +1,45 @@
+import java.util.Stack;
+
+public class SyntaxChecker {
+
+    public static boolean isBalanced(String line) {
+        Stack<Character> stack = new Stack<>();
+
+        for (int i = 0; i < line.length(); i++) {
+            char ch = line.charAt(i);
+
+            // Push opening symbols onto the stack
+            if (ch == '(' || ch == '{' || ch == '[') {
+                stack.push(ch);
+            }
+            // Handle closing symbols
+            else if (ch == ')' || ch == '}' || ch == ']') {
+                // If stack is empty, there's no matching opening symbol
+                if (stack.isEmpty()) {
+                    return false;
+                }
+
+                char top = stack.pop();
+
+                // Check if the popped symbol matches the closing symbol
+                if ((ch == ')' && top != '(') ||
+                        (ch == '}' && top != '{') ||
+                        (ch == ']' && top != '[')) {
+                    return false;
+                }
+            }
+            // Ignore all other characters
+        }
+
+        // If the stack is empty, all symbols were matched
+        return stack.isEmpty();
+    }
+}
+
+public static void main(String[] args) {
+    System.out.println(SyntaxChecker.isBalanced("{[()]}")); // true
+    System.out.println(SyntaxChecker.isBalanced("{[(])}")); // false
+    System.out.println(SyntaxChecker.isBalanced("System.out.println(\"Hello {World}\");")); // true
+    System.out.println(SyntaxChecker.isBalanced("((())")); // false
+}
+
