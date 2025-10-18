@@ -1,0 +1,102 @@
+public class MazeSolver {
+
+    // The maze grid
+    private final char[][] maze;
+
+    // Dimensions
+    private final int rows;
+    private final int cols;
+
+    // Constructor
+    public MazeSolver(char[][] maze) {
+        this.maze = maze;
+        this.rows = maze.length;
+        this.cols = maze[0].length;
+    }
+
+    // Recursive solver
+    public boolean solve(int row, int col) {
+        // Base case 1: out of bounds
+        if (row < 0 || col < 0 || row >= rows || col >= cols)
+            return false;
+
+        // Base case 2: wall or visited cell
+        if (maze[row][col] == '#' || maze[row][col] == '.')
+            return false;
+
+        // Base case 3: found the finish
+        if (maze[row][col] == 'F')
+            return true;
+
+        // Mark current cell as part of the path
+        maze[row][col] = '.';
+
+        // Try moving North, East, South, West
+        if (solve(row - 1, col) || // up
+                solve(row, col + 1) || // right
+                solve(row + 1, col) || // down
+                solve(row, col - 1))   // left
+            return true;
+
+        // Backtrack - unmark dead end
+        maze[row][col] = ' ';
+        return false;
+    }
+
+    
+    public void printMaze() {
+        for (char[] row : maze) {
+            System.out.println(row);
+        }
+    }
+
+    // Locate start position 'S'
+    int[] findStart() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (maze[i][j] == 'S')
+                    return new int[]{i, j};
+            }
+        }
+        return null;
+    }
+}
+
+public static void main(String[] args) {
+
+    // Maze 1: solvable
+    char[][] maze1 = {
+            "#########".toCharArray(),
+            "#S     F#".toCharArray(),
+            "# ### ###".toCharArray(),
+            "#       #".toCharArray(),
+            "#########".toCharArray()
+    };
+
+    // Maze 2: unsolvable
+    char[][] maze2 = {
+            "#########".toCharArray(),
+            "#S#   #F#".toCharArray(),
+            "# ### ###".toCharArray(),
+            "#       #".toCharArray(),
+            "#########".toCharArray()
+    };
+
+    System.out.println("=== Solvable Maze ===");
+    MazeSolver solver1 = new MazeSolver(maze1);
+    int[] start1 = solver1.findStart();
+    if (solver1.solve(start1[0], start1[1]))
+        System.out.println("Path found!");
+    else
+        System.out.println("No path found.");
+    solver1.printMaze();
+
+    System.out.println("\n=== Unsolvable Maze ===");
+    MazeSolver solver2 = new MazeSolver(maze2);
+    int[] start2 = solver2.findStart();
+    if (solver2.solve(start2[0], start2[1]))
+        System.out.println("Path found!");
+    else
+        System.out.println("No path found.");
+    solver2.printMaze();
+}
