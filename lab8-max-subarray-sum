@@ -1,0 +1,78 @@
+public class MaxSubarraySolver {
+
+    /**
+     * - Outer loop runs n times.
+     * - Inner loop runs up to n - i times.
+     * - Inside inner loop: 1 addition, 1 comparison per iteration = O(1)
+     * Total operations ≈ n + (n-1) + (n-2) + ... + 1 = n(n+1)/2 = O(n^2)
+     */
+    public static int bruteForceMaxSum(int[] arr) {
+        int maxSum = Integer.MIN_VALUE;
+        int n = arr.length;
+
+        for (int i = 0; i < n; i++) { // Outer loop → n iterations
+            int currentSum = 0;
+            for (int j = i; j < n; j++) { // Inner loop → up to n - i iterations
+                currentSum += arr[j]; // Primitive op: addition
+                if (currentSum > maxSum) { // Primitive op: comparison
+                    maxSum = currentSum;
+                }
+            }
+        }
+        return maxSum;
+    }
+
+    /**
+     * Finds the maximum subarray sum using Kadane's Algorithm.
+     * Theoretical Complexity: O(n)
+     */
+    public static int kadanesAlgorithmMaxSum(int[] arr) {
+        int maxSoFar = arr[0];
+        int currentMax = arr[0];
+
+        for (int i = 1; i < arr.length; i++) {
+            // Either extend the existing subarray or start a new one
+            currentMax = Math.max(arr[i], currentMax + arr[i]);
+            maxSoFar = Math.max(maxSoFar, currentMax);
+        }
+
+        return maxSoFar;
+    }
+}
+
+import java.util.Random;
+
+public class SubarrayTester {
+
+    public static void main(String[] args) {
+        int[] sizes = {1000, 5000, 10000, 50000, 100000};
+
+        System.out.println("--- Maximum Subarray Sum Algorithm Comparison ---");
+
+        for (int n : sizes) {
+            System.out.println("\n--- Testing for array size n = " + n + " ---");
+
+            int[] arr = generateRandomArrayWithNegatives(n);
+
+            // Time Brute Force
+            long start = System.nanoTime();
+            int bruteResult = MaxSubarraySolver.bruteForceMaxSum(arr);
+            long end = System.nanoTime();
+            double bruteTimeMs = (end - start) / 1_000_000.0;
+
+            // Time Kadane's Algorithm
+            start = System.nanoTime();
+            int kadaneResult = MaxSubarraySolver.kadanesAlgorithmMaxSum(arr);
+            end = System.nanoTime();
+            double kadaneTimeMs = (end - start) / 1_000_000.0;
+
+            // Display results
+            System.out.printf("Brute-Force Result: %d | Time: %.3f ms%n", bruteResult, bruteTimeMs);
+            System.out.printf("Kadane's Algorithm Result: %d | Time: %.3f ms%n", kadaneResult, kadaneTimeMs);
+
+            // Sanity check: both results should be the same
+            if (bruteResult != kadaneResult) {
+                System.out.println("Warning: Results differ! Check implementation.");
+            }
+        }
+    }
