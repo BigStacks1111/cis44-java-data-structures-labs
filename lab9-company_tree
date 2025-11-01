@@ -1,0 +1,90 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class GeneralTreeNode {
+    String name;
+    GeneralTreeNode parent;
+    List<GeneralTreeNode> children;
+
+    public GeneralTreeNode(String name) {
+        this.name = name;
+        this.parent = null;
+        this.children = new ArrayList<>();
+    }
+
+    public void addChild(GeneralTreeNode child) {
+        child.parent = this;
+        this.children.add(child);
+    }
+
+    // Preorder traversal with numbering
+    public void traversePreorder(int[] counter) {
+        counter[0]++;
+        System.out.println(counter[0] + ": " + this.name);
+        for (GeneralTreeNode child : children) {
+            child.traversePreorder(counter);
+        }
+    }
+
+    // Postorder traversal with numbering
+    public void traversePostorder(int[] counter) {
+        for (GeneralTreeNode child : children) {
+            child.traversePostorder(counter);
+        }
+        counter[0]++;
+        System.out.println(counter[0] + ": " + this.name);
+    }
+
+    // Print tree diagram
+    public void printTree() {
+        printTreeHelper("", true);
+    }
+
+    private void printTreeHelper(String prefix, boolean isTail) {
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + name);
+        for (int i = 0; i < children.size() - 1; i++) {
+            children.get(i).printTreeHelper(prefix + (isTail ? "    " : "│   "), false);
+        }
+        if (!children.isEmpty()) {
+            children.getLast().printTreeHelper(prefix + (isTail ? "    " : "│   "), true);
+        }
+    }
+}
+
+public class CompanyTreeDriver {
+    public static void main(String[] args) {
+        // Build the company tree
+        GeneralTreeNode root = new GeneralTreeNode("CEO");
+        GeneralTreeNode vpSales = new GeneralTreeNode("VP of Sales");
+        GeneralTreeNode vpEngineering = new GeneralTreeNode("VP of Engineering");
+        root.addChild(vpSales);
+        root.addChild(vpEngineering);
+
+        GeneralTreeNode salesNA = new GeneralTreeNode("Sales Manager (NA)");
+        GeneralTreeNode salesEU = new GeneralTreeNode("Sales Manager (EU)");
+        vpSales.addChild(salesNA);
+        vpSales.addChild(salesEU);
+
+        GeneralTreeNode devLead = new GeneralTreeNode("Dev Team Lead");
+        GeneralTreeNode qaLead = new GeneralTreeNode("QA Team Lead");
+        vpEngineering.addChild(devLead);
+        vpEngineering.addChild(qaLead);
+
+        GeneralTreeNode developer1 = new GeneralTreeNode("Developer 1");
+        GeneralTreeNode developer2 = new GeneralTreeNode("Developer 2");
+        devLead.addChild(developer1);
+        devLead.addChild(developer2);
+
+        // Print the company tree diagram
+        System.out.println("--- Company Tree Diagram ---");
+        root.printTree();
+
+        // Preorder traversal with visit numbers
+        System.out.println("\n--- Preorder Traversal (Company Hierarchy) ---");
+        root.traversePreorder(new int[]{0});
+
+        // Postorder traversal with visit numbers
+        System.out.println("\n--- Postorder Traversal (Staff Roll Call) ---");
+        root.traversePostorder(new int[]{0});
+    }
+}
