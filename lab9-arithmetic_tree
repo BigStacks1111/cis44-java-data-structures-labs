@@ -1,0 +1,98 @@
+public class BinaryTreeNode {
+    String value;
+    BinaryTreeNode parent;
+    BinaryTreeNode left;
+    BinaryTreeNode right;
+
+    public BinaryTreeNode(String value) {
+        this.value = value;
+        this.parent = null;
+        this.left = null;
+        this.right = null;
+    }
+
+    // Traversals (preorder, inorder, postorder) remain the same
+    public void traversePreorder() {
+        System.out.print(this.value + " ");
+        if (left != null) left.traversePreorder();
+        if (right != null) right.traversePreorder();
+    }
+
+    public void traverseInorder() {
+        if (left != null) {
+            System.out.print("(");
+            left.traverseInorder();
+        }
+        System.out.print(this.value);
+        if (right != null) {
+            right.traverseInorder();
+            System.out.print(")");
+        }
+    }
+
+    public void traversePostorder() {
+        if (left != null) left.traversePostorder();
+        if (right != null) right.traversePostorder();
+        System.out.print(this.value + " ");
+    }
+
+    // Print tree diagram
+    public void printTree() {
+        printTreeHelper("", true);
+    }
+
+    private void printTreeHelper(String prefix, boolean isTail) {
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + value);
+        if (left != null || right != null) {
+            if (left != null) left.printTreeHelper(prefix + (isTail ? "    " : "│   "), right == null);
+            if (right != null) right.printTreeHelper(prefix + (isTail ? "    " : "│   "), true);
+        }
+    }
+}
+
+
+public class ExpressionTreeDriver {
+    public static void main(String[] args) {
+        // Build the tree for: ( (3 + 7) * (9 - 4) )
+
+
+        BinaryTreeNode root = new BinaryTreeNode("*");
+        BinaryTreeNode plus = new BinaryTreeNode("+");
+        BinaryTreeNode minus = new BinaryTreeNode("-");
+        BinaryTreeNode n3 = new BinaryTreeNode("3");
+        BinaryTreeNode n7 = new BinaryTreeNode("7");
+        BinaryTreeNode n9 = new BinaryTreeNode("9");
+        BinaryTreeNode n4 = new BinaryTreeNode("4");
+
+        root.left = plus;
+        root.right = minus;
+        plus.left = n3;
+        plus.right = n7;
+        minus.left = n9;
+        minus.right = n4;
+
+        // Print tree diagram
+        System.out.println("--- Arithmetic Expression Tree Diagram ---\n");
+        printHandDrawnTree(root);
+
+        // Traversals
+        System.out.println("\n--- Preorder (Prefix) ---");
+        root.traversePreorder();
+
+        System.out.println("\n\n--- Inorder (Infix) ---");
+        root.traverseInorder();
+
+        System.out.println("\n\n--- Postorder (Postfix) ---");
+        root.traversePostorder();
+    }
+
+    // Method to print tree
+    public static void printHandDrawnTree(BinaryTreeNode root) {
+        System.out.println("        " + root.value);
+        System.out.println("       / \\");
+        System.out.println("      " + root.left.value + "   " + root.right.value);
+        System.out.println("     / \\ / \\");
+        System.out.println("    " + root.left.left.value + "  " + root.left.right.value
+                + " " + root.right.left.value + "  " + root.right.right.value);
+    }
+}
