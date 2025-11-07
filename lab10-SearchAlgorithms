@@ -1,0 +1,74 @@
+public class SearchComparison {
+
+    /**
+     * Lab 1a: Iterative Linear Search
+     */
+    public static int linearSearch(int[] arr, int key) {
+        int comparisonCounter = 0; // Counts comparisons
+        for (int i = 0; i < arr.length; i++) {
+            comparisonCounter++;
+            if (arr[i] == key) {
+                System.out.println("Linear search comparisons: " + comparisonCounter);
+                return i;
+            }
+        }
+        System.out.println("Linear search comparisons: " + comparisonCounter);
+        return -1;
+    }
+
+    /**
+     * Lab 1b: Iterative Binary Search
+     */
+    public static int binarySearch(int[] arr, int key) {
+        int low = 0;
+        int high = arr.length - 1;
+        int comparisonCounter = 0; // Counts comparisons
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            comparisonCounter++;
+            if (arr[mid] == key) {
+                System.out.println("Binary search comparisons: " + comparisonCounter);
+                return mid;
+            } else if (key < arr[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        System.out.println("Binary search comparisons: " + comparisonCounter);
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] unsortedData = {22, 8, 12, 1, 9, 30, 4, 15};
+        int[] sortedData =   {1, 4, 8, 9, 12, 15, 22, 30};
+
+        System.out.println("--- Lab 1: Search Algorithm Implementation ---");
+
+        // Test Linear Search
+        System.out.println("Linear Search (Unsorted):");
+        System.out.println("Find 9: Index " + linearSearch(unsortedData, 9)); // Expected: 4
+        System.out.println("Find 3: Index " + linearSearch(unsortedData, 3)); // Expected: -1
+
+        // Test Binary Search
+        System.out.println("\nBinary Search (Sorted):");
+        System.out.println("Find 9: Index " + binarySearch(sortedData, 9)); // Expected: 3
+        System.out.println("Find 3: Index " + binarySearch(sortedData, 3)); // Expected: -1
+        System.out.println("Find 30: Index " + binarySearch(sortedData, 30)); // Expected: 7
+    }
+}
+
+
+
+
+1. The best-case time complexity for linearSearch is O(1), which occurs when the key is at the first element. The worst-case time complexity is O(N), which happens when the key is at the last element or not in the array.
+
+2. The best-case time complexity for binarySearch is O(1), which occurs when the key is exactly in the middle at the first check. The worst-case time complexity is O(log N), which happens when the key is found in the last search interval after repeatedly dividing the array.
+
+3. Binary search requires the array to be sorted because it divides the array and uses the middle element to decide whether to search the left or right half. If the array is unsorted, the middle element does not provide information about which side to search. For example, searching for 22 in unsortedData = {22, 8, 12, 1, 9, 30, 4, 15} could incorrectly eliminate sections of the array that actually contain the key, causing the search to fail.
+
+4. For sortedData searching for 30, linear search traverses all elements until it finds 30 at index 7, taking 8 comparisons in the worst case. Binary search steps are as follows: mid = 3, 9 < 30, search right; mid = 5, 15 < 30, search right; mid = 6, 22 < 30, search right; mid = 7, 30 == 30, found. This results in 4 comparisons.
+
+5. If the array size doubles from N to 2N, linear search in the worst case roughly doubles the number of comparisons, going from O(N) to O(2N), which is still O(N) asymptotically. For binary search, the worst-case number of comparisons increases by 1, from O(log N) to O(log 2N) = O(log N + 1). This shows that binary search scales much better than linear search for large arrays.
+
