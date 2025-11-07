@@ -1,0 +1,97 @@
+// Helper class for the BST
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+        key = item;
+        left = right = null;
+    }
+}
+
+public class RecursiveSearch {
+
+    /**
+     * Lab 2a: Recursive Binary Search (Helper Method)
+     */
+    public static int recursiveBinarySearch(int[] arr, int key, int low, int high) {
+        // Base Case: If the search range is invalid, the key is not present.
+        if (low > high) {
+            return -1;
+        }
+
+        int mid = (low + high) / 2;
+
+        if (arr[mid] == key) {
+            return mid; // Found
+        } else if (key < arr[mid]) {
+            return recursiveBinarySearch(arr, key, low, mid - 1); // Search left half
+        } else {
+            return recursiveBinarySearch(arr, key, mid + 1, high); // Search right half
+        }
+    }
+
+    // Public wrapper method to start the recursive binary search
+    public static int searchArray(int[] arr, int key) {
+        return recursiveBinarySearch(arr, key, 0, arr.length - 1);
+    }
+
+    /**
+     * Lab 2b: Binary Search Tree Search
+     */
+    public Node searchBST(Node root, int key) {
+        // Base Case: The tree is empty or key found at root
+        if (root == null || root.key == key) {
+            return root;
+        }
+
+        // Recursive search depending on BST property
+        if (key < root.key) {
+            return searchBST(root.left, key); // Search left subtree
+        } else {
+            return searchBST(root.right, key); // Search right subtree
+        }
+    }
+
+    // --- Main method for testing ---
+    public static void main(String[] args) {
+        System.out.println("--- Lab 2: Recursive Search Algorithms ---");
+        
+        // Test Recursive Binary Search
+        int[] sortedData = {10, 20, 30, 40, 50, 60};
+        System.out.println("Recursive Binary Search:");
+        System.out.println("Find 40: Index " + searchArray(sortedData, 40)); // Expected: 3
+        System.out.println("Find 15: Index " + searchArray(sortedData, 15)); // Expected: -1
+
+        // Build a sample BST
+        RecursiveSearch bstSearcher = new RecursiveSearch();
+        Node root = new Node(40);
+        root.left = new Node(20);
+        root.right = new Node(60);
+        root.left.left = new Node(10);
+        root.left.right = new Node(30);
+        root.right.left = new Node(50);
+
+        System.out.println("\nBinary Search Tree Search:");
+        Node result1 = bstSearcher.searchBST(root, 30);
+        System.out.println("Find 30: " + (result1 != null ? "Found (" + result1.key + ")" : "Not Found")); // Expected: Found
+        
+        Node result2 = bstSearcher.searchBST(root, 45);
+        System.out.println("Find 45: " + (result2 != null ? "Found" : "Not Found")); // Expected: Not Found
+    }
+}
+
+
+
+
+1. In recursiveBinarySearch, the base case that stops the recursion when the element is not found occurs when low is greater than high. This indicates that the search range is invalid, and the key is not present in the array, so the method returns -1.
+
+2. The low and high parameters define the current subarray being searched. Each recursive call reduces the search range: if the key is less than the middle element, high becomes mid minus one to search the left half; if the key is greater, low becomes mid plus one to search the right half. This way, the problem is divided in half at each step, focusing only on the relevant portion of the array.
+
+3. The recursive BST search is similar in concept to recursive binary search, but it does not need low and high parameters because it relies on the tree structure rather than array indices. Each recursive call moves to either the left or right child of the current node, naturally narrowing the search space without the need for explicit indices.
+
+4. The BST property states that for any node, all keys in the left subtree are less than the node's key, and all keys in the right subtree are greater. The searchBST implementation uses this property to decide whether to search the left or right subtree by checking if the key is less than or greater than the current node’s key. This ensures that only the relevant subtree is explored.
+
+5. If the tree is completely unbalanced, such as nodes inserted in strictly increasing order, the tree behaves like a linked list. In this case, each recursive call only moves down one level, so the worst-case time complexity of searchBST is O(N), where N is the number of nodes.
+
+
