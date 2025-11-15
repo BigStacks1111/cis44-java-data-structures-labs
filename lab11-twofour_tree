@@ -1,0 +1,180 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+// -------------------------
+// Two-Four Node
+// -------------------------
+class TwoFourNode {
+    List<Integer> keys;
+    List<TwoFourNode> children;
+    TwoFourNode parent;
+
+    public TwoFourNode() {
+        keys = new ArrayList<>();
+        children = new ArrayList<>();
+        parent = null;
+    }
+
+    public boolean isLeaf() {
+        return children.isEmpty();
+    }
+
+    // Node is "full" when it has 3 keys
+    public boolean isFull() {
+        return keys.size() == 3;
+    }
+
+    // Determine which child to follow based on the key
+    public TwoFourNode getNextChild(int key) {
+        int i = 0;
+        while (i < keys.size() && key > keys.get(i)) {
+            i++;
+        }
+        return children.get(i);
+    }
+
+    // Insert key into node (it is guaranteed not full)
+    public void insertKey(int key) {
+        keys.add(key);
+        Collections.sort(keys);
+    }
+}
+
+
+// -------------------------
+// Two-Four Tree
+// -------------------------
+public class TwoFourTree {
+
+    private TwoFourNode root;
+
+    public TwoFourTree() {
+        root = new TwoFourNode();
+    }
+
+    public void insert(int key) {
+        TwoFourNode node = root;
+
+        // Descend to leaf
+        while (!node.isLeaf()) {
+            node = node.getNextChild(key);
+        }
+
+        // Insert into leaf
+        node.insertKey(key);
+
+        // Split upward if necessary
+        while (node != null && node.keys.size() > 3) {
+            split(node);
+            node = node.parent;
+        }
+    }
+
+    // -------------------------
+    // Split a 4-key node
+    // -------------------------
+    private void split(TwoFourNode node) {
+        System.out.println("Splitting node with keys: " + node.keys);
+
+        // Middle key to move up
+        int midKey = node.keys.get(1);
+
+        // Create left and right nodes from split
+        TwoFourNode left = new TwoFourNode();
+        TwoFourNode right = new TwoFourNode();
+
+        left.keys.add(node.keys.get(0));
+        right.keys.add(node.keys.get(2));
+
+        // If internal node, reassign children
+        if (!node.isLeaf()) {
+            left.children.add(node.children.get(0));
+            left.children.add(node.children.get(1));
+            right.children.add(node.children.get(2));
+            right.children.add(node.children.get(3));
+
+            // Update parent pointers for children
+            left.children.get(0).parent = left;
+            left.children.get(1).parent = left;
+            right.children.get(0).parent = right;
+            right.children.get(1).parent = right;
+        }
+
+        // If node is root, create new root
+        if (node.parent == null) {
+            TwoFourNode newRoot = new TwoFourNode();
+            newRoot.keys.add(midKey);
+            newRoot.children.add(left);
+            newRoot.children.add(right);
+            root = newRoot;
+
+            left.parent = root;
+            right.parent = root;
+            return;
+        }
+
+        // Otherwise, promote middle key to parent
+        TwoFourNode parent = node.parent;
+
+        // Insert middle key into parent
+        parent.insertKey(midKey);
+
+        // Find index position in parent where promoted key was placed
+        int index = parent.keys.indexOf(midKey);
+
+        // Replace old child with left, and insert right child after it
+        parent.children.set(index, left);
+        parent.children.add(index + 1, right);
+
+        left.parent = parent;
+        right.parent = parent;
+    }
+
+    // -------------------------
+    // INORDER TRAVERSAL
+    // -------------------------
+    public void inorder() {
+        System.out.print("Inorder: ");
+        inorder(root);
+        System.out.println();
+    }
+
+    private void inorder(TwoFourNode node) {
+        if (node == null) return;
+
+        if (node.isLeaf()) {
+            for (int k : node.keys) {
+                System.out.print(k + " ");
+            }
+        } else {
+            int i;
+            for (i = 0; i < node.keys.size(); i++) {
+                inorder(node.children.get(i));
+                System.out.print(node.keys.get(i) + " ");
+            }
+            inorder(node.children.get(i));
+        }
+    }
+}
+
+
+public class TwoFourTreeDriver {
+    public static void main(String[] args) {
+
+        TwoFourTree tree = new TwoFourTree();
+
+        int[] keys = {10, 20, 30, 40, 50, 5, 15, 25, 35};
+
+        System.out.println("Inserting keys into 2-4 Tree...");
+        for (int key : keys) {
+            System.out.println("Inserting: " + key);
+            tree.insert(key);
+        }
+
+        System.out.println("\nFinal Tree Traversal:");
+        tree.inorder();
+
+        System.out.println("\nExpected Inorder: 5 10 15 20 25 30 35 40 50");
+    }
+}
