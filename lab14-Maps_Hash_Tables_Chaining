@@ -1,0 +1,145 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+// --- 1. Entry ADT ---
+class Entry<K, V> {
+    private final K key;
+    private V value;
+
+    public Entry(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public K getKey() { return key; }
+    public V getValue() { return value; }
+
+    public V setValue(V value) {
+        V old = this.value;
+        this.value = value;
+        return old;
+    }
+}
+
+// --- 2. Map Interface ---
+interface MapADT<K, V> {
+    V get(K key);
+    V put(K key, V value);
+    V remove(K key);
+    int size();
+    boolean isEmpty();
+}
+
+// --- 3. Separate Chaining Hash Map ---
+class SeparateChainingMap<K, V> implements MapADT<K, V> {
+    private ArrayList<LinkedList<Entry<K, V>>> table;
+    private int size = 0;
+    private final int N = 11; // Small prime → forces collisions
+
+    public SeparateChainingMap() {
+        table = new ArrayList<>(N);
+        for (int i = 0; i < N; i++) {
+            table.add(new LinkedList<Entry<K, V>>());
+        }
+    }
+
+    private int hash(K key) {
+        return Math.abs(key.hashCode() % N);
+    }
+
+    public int size() { return size; }
+    public boolean isEmpty() { return size == 0; }
+
+    // TODO 
+    public V get(K key) {
+        // 1. Calculate hash index
+        int h = hash(key);
+
+        // 2. Search bucket
+        LinkedList<Entry<K, V>> bucket = table.get(h);
+
+        for (Entry<K, V> entry : bucket) {
+            if (entry.getKey().equals(key)) {
+                return entry.getValue();
+            }
+        }
+
+        // 3. Not found
+        return null;
+    }
+
+    // Completed put()
+    public V put(K key, V value) {
+        int h = hash(key);
+        LinkedList<Entry<K, V>> bucket = table.get(h);
+
+        // Check for existing key
+        for (Entry<K, V> entry : bucket) {
+            if (entry.getKey().equals(key)) {
+                return entry.setValue(value);
+            }
+        }
+
+        // Add new entry at front of bucket
+        bucket.addFirst(new Entry<>(key, value));
+        size++;
+        return null;
+    }
+
+    public V remove(K key) {
+        int h = hash(key);
+        LinkedList<Entry<K, V>> bucket = table.get(h);
+
+        Entry<K, V> toRemove = null;
+
+        for (Entry<K, V> entry : bucket) {
+            if (entry.getKey().equals(key)) {
+                toRemove = entry;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            V oldValue = toRemove.getValue();
+            bucket.remove(toRemove);
+            size--;
+            return oldValue;
+        }
+
+        return null;
+    }
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+        SeparateChainingMap<String, String> map = new SeparateChainingMap<>();
+
+        // Insert keys deliberately designed to collide in table size N = 11
+        // (Short strings like "Aa", "BB", "C1", etc. often collide)
+        
+        System.out.println("Insertions:");
+        System.out.println(map.put("Aa", "First"));   // expect null
+        System.out.println(map.put("BB", "Second"));  // expect null
+        System.out.println(map.put("C1", "Third"));   // expect null
+
+        // Display their hash bucket indices
+        System.out.println("\nHash Bucket Indices:");
+        System.out.println("Aa → " + Math.abs("Aa".hashCode() % 11));
+        System.out.println("BB → " + Math.abs("BB".hashCode() % 11));
+        System.out.println("C1 → " + Math.abs("C1".hashCode() % 11));
+
+        System.out.println("\nRetrieving (should demonstrate searching within bucket):");
+        System.out.println("get(Aa): " + map.get("Aa"));
+        System.out.println("get(BB): " + map.get("BB"));
+        System.out.println("get(C1): " + map.get("C1"));
+
+        System.out.println("\nRemoval Test:");
+        System.out.println("remove(BB): " + map.remove("BB"));
+
+        System.out.println("\nAfter Removal:");
+        System.out.println("get(BB): " + map.get("BB")); // expect null
+
+        System.out.println("\nFinal Size: " + map.size());
+    }
+}
